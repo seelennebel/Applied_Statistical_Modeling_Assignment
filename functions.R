@@ -7,6 +7,7 @@ download_packages <- function() {
   install.packages("dplyr")
   install.packages("tidyr")
   install.packages("gridExtra")
+  install.packages("dunn.test")
   
 }
 
@@ -18,6 +19,7 @@ load_packages <- function() {
   library(tidyr)
   library(gridExtra)
   library(stats)
+  library(dunn.test)
   
 }
 
@@ -30,13 +32,13 @@ load_dataset <- function(path) {
 }
 
 # create a pie chart with types
-display_column_types <- function(amzn) {
+display_column_types <- function(amzn, message="Data Frame Classes") {
   
   classes <- lapply(amzn, class)
   class_vector <- unlist(classes)
   class_counts <- table(class_vector)
 
-  pie(class_counts, labels=names(class_counts), main="Data Frame Classes")
+  pie(class_counts, labels=names(class_counts), main=message)
   
 }
 
@@ -49,8 +51,7 @@ select_features <- function(amzn) {
     "actual_price",
     "discount_percentage",
     "rating",
-    "rating_count",
-    "about_product"
+    "rating_count"
   )
   
   amzn <- amzn[selected_features]
@@ -96,8 +97,6 @@ clean_dataset <- function(amzn) {
   amzn$rating_count <- replace_na(amzn$rating_count, 0)
   
   amzn$rating <- as.numeric(amzn$rating)
-  
-  check_na_values(amzn)
   
   return(amzn)
   
