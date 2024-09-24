@@ -1,13 +1,13 @@
 # dataset URL
 # https://www.kaggle.com/datasets/karkavelrajaj/amazon-sales-dataset
 
-source("C://Users/seelennebel/dev/Applied_Statistical_Modeling_Assignment/functions.R")
+source("/Users/seelennebel/development/Applied_Statistical_Modeling_Assignment/functions.R")
 
 #download_packages()
 
 load_packages()
 
-amzn <- load_dataset("C:/Users/seelennebel/dev/Applied_Statistical_Modeling_Assignment/amazon.csv")
+amzn <- load_dataset("/Users/seelennebel/development/Applied_Statistical_Modeling_Assignment/amazon.csv")
 
 display_column_types(amzn)
 
@@ -15,9 +15,11 @@ amzn <- select_features(amzn)
 
 amzn <- clean_dataset(amzn)
 
-display_column_types(amzn)
-
 amzn <- feature_engineering(amzn)
+
+check_na_values(amzn)
+
+display_column_types(amzn)
 
 # display PDFs of all numerical and integer features
 {
@@ -30,41 +32,68 @@ amzn <- feature_engineering(amzn)
   grid.arrange(discounted_price_PDF, actual_price_PDF, discount_percentage_PDF, rating_PDF, rating_count_PDF)
 }
 
-# create a classified dataset
-classified_amzn <- mutate(amzn,
-  discount_percentage_category = case_when(
-    amzn$discount_percentage == 0 ~ "0%",
-    amzn$discount_percentage <= 0.2 ~ "<20%",
-    amzn$discount_percentage <= 0.4 ~ "<40%",
-    amzn$discount_percentage <= 0.6 ~ "<60%",
-    amzn$discount_percentage <= 0.8 ~ "<80%",
-    amzn$discount_percentage <= 1 ~ "<100%"
-  )
-) 
+# create a classified amzn dataset
+{
+  classified_amzn <- mutate(amzn,
+    discount_percentage_category = case_when(
+      amzn$discount_percentage == 0 ~ "0%",
+      amzn$discount_percentage <= 0.2 ~ "<20%",
+      amzn$discount_percentage <= 0.4 ~ "<40%",
+      amzn$discount_percentage <= 0.6 ~ "<60%",
+      amzn$discount_percentage <= 0.8 ~ "<80%",
+      amzn$discount_percentage <= 1 ~ "<100%"
+      )
+    )
+}
 
-zero <- filter(classified_amzn, discount_percentage_category=="0%")
-twenty <- filter(classified_amzn, discount_percentage_category=="<20%")
-forty <- filter(classified_amzn, discount_percentage_category=="<40%")
-sixty <- filter(classified_amzn, discount_percentage_category=="<60%")
-eighty <- filter(classified_amzn, discount_percentage_category=="<80%")
-one_hundred <- filter(classified_amzn, discount_percentage_category=="<100%")
+check_na_values(classified_amzn)
 
-category_counts <- classified_amzn %>%
-  count(discount_percentage_category)
+# create a bar plot with category counts
+{
+  category_counts <- classified_amzn %>%
+    count(discount_percentage_category)
+  
+  ggplot(category_counts, aes(x = discount_percentage_category, y = n)) +
+    geom_bar(stat = "identity", fill = "black", color = "black") +
+    theme_minimal() +
+    labs(title = "Count of Each discount_percentage category", x = "category", y = "count")
+}
 
-ggplot(category_counts, aes(x = discount_percentage_category, y = n)) +
-  geom_bar(stat = "identity", fill = "black", color = "black") +
-  theme_minimal() +
-  labs(title = "Count of Each discount_percentage category", x = "category", y = "count")
+# create contingency table for the chi-squared test
+{
+  discount_contingency_table <- table(classified_amzn$discount_percentage_category)
+  cat("Contingency table for the chi-squared test", "\n")
+  print(discount_contingency_table)
+}
 
-discount_contingency_table <- table(classified_amzn$discount_percentage_category)
-print(discount_contingency_table)
+# box plot of each category based on rating
+{
+  ggplot(classified_amzn, aes(x = discount_percentage_category, y = rating)) +
+    geom_boxplot(fill = "white") +
+    labs(title = "Ratings by Discount Percentage Category", x = "Discount Percentage Category", y = "Rating") +
+    theme_minimal()
+}
 
-# chi-squared test for discount_percentage categories
-chi_squared_test <- chisq.test(contingency_table)
-print(chi_squared_test)
+# ANOVA test for discount percentage category and rating
+{
+  anova_rating <- aov(rating ~ discount_percentage_category, data=classified_amzn)
+  summary(anova_rating)
+}
 
-anova_rating <- aov(rating ~ discount_percentage_category, data=classified_amzn)
-summary(anova_rating)
+# post-hoc analysis of rating ANOVA
+{
+  post_hoc_rating <- TukeyHSD(anova_rating)
+  plot(post_hoc_rating)
+}
 
-post_hoc_rating <- TurkeyHSD(anova_rating)
+# ANOVA test for discount percentage category and rating_count
+{
+  anova_rating_count <- aov(rating_count ~ discount_percentage_category, data=classified_amzn)
+  summary(anova_rating_count)
+}
+
+# post-hoc analysis of rating_count ANOVA
+{
+  post_hoc_rating_count <- TukeyHSD(anova_rating_count)
+  plot(post_hoc_rating_count)
+}
