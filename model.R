@@ -4,12 +4,12 @@
 # enter path to functions.R
 source()
 
+# enter path to the dataset
+amzn <- load_dataset()
+
 download_packages()
 
 load_packages()
-
-# enter path to the dataset
-amzn <- load_dataset()
 
 display_column_types(amzn, message="Initial Data Frame Classes")
 
