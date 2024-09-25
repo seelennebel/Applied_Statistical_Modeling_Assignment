@@ -126,3 +126,24 @@ probability_density_function <- function(data, column, label) {
     theme_dark()
   
 }
+
+# create a median bar plot
+median_plot <- function(medians, main_value="", xlab_value="", ylab_value="") {
+  barplot(medians,
+          main = main_value,
+          xlab = xlab_value,
+          ylab = ylab_value,
+          col = "white",
+          border = "black",
+          names.arg = levels(classified_amzn$discount_percentage_category))
+}
+
+mean_plot <- function(means, main_value="", xlab_value="", ylab_value="") {
+  barplot(means,
+          main = main_value,
+          xlab = xlab_value,
+          ylab = ylab_value,
+          col = "white",
+          border = "black",
+          names.arg = levels(classified_amzn$discount_percentage_category))
+}
