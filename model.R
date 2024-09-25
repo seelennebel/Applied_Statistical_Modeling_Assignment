@@ -1,13 +1,15 @@
 # dataset URL
 # https://www.kaggle.com/datasets/karkavelrajaj/amazon-sales-dataset
 
-source("~/development/Applied_Statistical_Modeling_Assignment/functions.R")
+# enter path to functions.R
+source()
 
-#download_packages()
+download_packages()
 
 load_packages()
 
-amzn <- load_dataset("~/development/Applied_Statistical_Modeling_Assignment/amazon.csv")
+# enter path to the dataset
+amzn <- load_dataset()
 
 display_column_types(amzn, message="Initial Data Frame Classes")
 
@@ -74,17 +76,8 @@ ggplot(category_counts, aes(x = discount_percentage_category, y = n)) +
   theme_minimal() +
   labs(title = "Count of each discount_percentage category", x = "category", y = "count")
 
-
-rating_medians <- tapply(classified_amzn$rating, classified_amzn$discount_percentage_category, median)
-median_plot(rating_medians, "Median Rating by Discount Percentage Category", xlab="discount percentage category", ylab="median rating")
-
 rating_means <- tapply(classified_amzn$rating, classified_amzn$discount_percentage_category, mean)
 mean_plot(rating_means, "Mean Rating by Discount Percentage Category", xlab="discount percentage category", ylab="mean rating")
 
-
-rating_count_medians <- tapply(classified_amzn$rating_count, classified_amzn$discount_percentage_category, median)
-median_plot(rating_count_medians, "Median Rating Count by Discount Percentage Category", xlab="discount percentage category", ylab="median rating count")
-
 rating_count_means <- tapply(classified_amzn$rating_count, classified_amzn$discount_percentage_category, mean)
 mean_plot(rating_count_means, "Mean Rating Count by Discount Percentage Category", xlab="discount percentage category", ylab="mean rating count")
-
