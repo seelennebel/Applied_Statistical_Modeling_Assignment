@@ -7,3 +7,8 @@ cd Applied_Statistical_Modeling_Assignment
 Change the model.R file:
 - enter the path to "functions.R" file as the input of the "source" method
 - enter the path to amazon.csv as the input of the "load_dataset" function
+
+### Launching
+```
+Rscript ./model.R
+```
